@@ -96,6 +96,13 @@
   .empty { color: var(--muted); font-size: 14px; padding: 12px 0; }
   .tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--card); font-size: 12px; padding: 6px 10px; border-radius: 8px; opacity: 0; transition: opacity .1s; z-index: 10; white-space: nowrap; }
   footer { font-size: 12px; color: var(--muted); margin-top: 20px; }
+  .acceso { max-width: 400px; margin: 40px auto; text-align: center; padding: 32px 24px; }
+  .acceso img { width: 44px; margin-bottom: 12px; }
+  .acceso input { width: 100%; font: inherit; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); margin-top: 4px; }
+  .acceso input:focus { outline: 3px solid var(--pro); outline-offset: 1px; }
+  .acceso button { width: 100%; height: 50px; margin-top: 12px; border: 0; border-radius: 12px; background: var(--pro); color: #fff; font: inherit; font-weight: 600; font-size: 16px; cursor: pointer; }
+  .acceso button:disabled { opacity: .6; }
+  .acceso .msg { color: var(--det); font-size: 14px; min-height: 20px; margin: 10px 0 0; }
   .err { background: var(--card); border: 1px solid var(--det); padding: 16px; border-radius: 12px; }
   @media (max-width: 820px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .kpi.hero { grid-column: span 3; } .grid2 { grid-template-columns: 1fr; } }
   @media (max-width: 420px) { .attr, .scale { grid-template-columns: 96px 1fr 62px; gap: 8px; } .kpi .val { font-size: 24px; } .kpi { padding: 14px 12px; } .kpi .lbl { font-size: 12px; } .kpi.hero .val { font-size: 44px; } }
@@ -107,7 +114,7 @@
     <div class="id"><img src="logo.svg" alt="Hostech"><div><small>HOSTECH · Buen Provecho Check</small><h1>Resultados del servicio de comida</h1></div></div>
     <label><span class="visually-hidden" style="position:absolute;left:-9999px">Bimestre</span><select id="bim"></select></label>
   </header>
-  <div id="app"><p class="empty">Cargando resultados…</p></div>
+  <div id="app"><p class="empty">Cargando…</p></div>
   <footer>NPS = % de promotores (9–10) menos % de detractores (0–6). Va de −100 a 100. Atributos en escala de 1 a 5. Encuesta anónima. <span id="upd"></span></footer>
 </div>
 <div class="tip" id="tip" role="tooltip"></div>
@@ -277,15 +284,44 @@
   }
 
   if (esDemo) { iniciar(demo()); return; }
-  fetch(url + "?k=" + encodeURIComponent(params.get("k") || ""))
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      if (!d.ok) throw new Error(d.error === "Clave inválida" ? "El enlace no tiene una clave válida. Pide el enlace completo del panel." : d.error);
-      iniciar(d);
-    })
-    .catch(function (e) {
-      document.getElementById("app").innerHTML = '<div class="err">No se pudieron cargar los resultados. ' + esc(e.message) + "</div>";
+
+  function sesion(fn) { try { return fn(window.sessionStorage); } catch (e) { return null; } }
+
+  // Pantalla de acceso: pide la clave antes de mostrar resultados
+  function pedirClave(msg) {
+    document.getElementById("bim").hidden = true;
+    document.getElementById("app").innerHTML =
+      '<form class="card acceso" id="acceso"><img src="logo.svg" alt=""><h2>Acceso al panel</h2>' +
+      '<p class="desc">Escribe la clave que te compartió Hostech para ver los resultados.</p>' +
+      '<input id="clave" type="password" autocomplete="current-password" placeholder="Clave de acceso" required>' +
+      '<button type="submit">Ver resultados</button><p class="msg" role="alert">' + (msg || "") + "</p></form>";
+    var input = document.getElementById("clave");
+    input.focus();
+    document.getElementById("acceso").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (input.value.trim()) cargar(input.value.trim());
     });
+  }
+
+  function cargar(clave) {
+    var btn = document.querySelector("#acceso button");
+    if (btn) { btn.disabled = true; btn.textContent = "Verificando…"; }
+    fetch(url + "?k=" + encodeURIComponent(clave))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.ok && d.error === "Clave inválida") { sesion(function (s) { s.removeItem("panel-clave"); }); pedirClave("Clave incorrecta. Revísala e inténtalo de nuevo."); return; }
+        if (!d.ok) throw new Error(d.error);
+        sesion(function (s) { s.setItem("panel-clave", clave); });
+        document.getElementById("bim").hidden = false;
+        iniciar(d);
+      })
+      .catch(function (e) {
+        document.getElementById("app").innerHTML = '<div class="err">No se pudieron cargar los resultados. ' + esc(e.message) + "</div>";
+      });
+  }
+
+  var guardada = params.get("k") || sesion(function (s) { return s.getItem("panel-clave"); });
+  if (guardada) cargar(guardada); else pedirClave();
 })();
 </script>
 </body>
