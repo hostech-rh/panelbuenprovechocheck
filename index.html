@@ -96,6 +96,10 @@
   .empty { color: var(--muted); font-size: 14px; padding: 12px 0; }
   .tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--card); font-size: 12px; padding: 6px 10px; border-radius: 8px; opacity: 0; transition: opacity .1s; z-index: 10; white-space: nowrap; }
   footer { font-size: 12px; color: var(--muted); margin-top: 20px; }
+  .acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .guia { background: #fdd100; color: #14142b; text-decoration: none; font-weight: 600; font-size: 14px; padding: 9px 16px; border-radius: 10px; white-space: nowrap; }
+  .guia:hover { background: #f4c400; }
+  .guia:focus-visible { outline: 3px solid var(--pro); outline-offset: 2px; }
   .acceso { max-width: 400px; margin: 40px auto; text-align: center; padding: 32px 24px; }
   .acceso img { width: 44px; margin-bottom: 12px; }
   .acceso input { width: 100%; font: inherit; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); margin-top: 4px; }
@@ -112,7 +116,10 @@
 <div class="wrap">
   <header>
     <div class="id"><img src="logo.svg" alt="Hostech"><div><small>HOSTECH · Buen Provecho Check</small><h1>Resultados del servicio de comida</h1></div></div>
-    <label><span class="visually-hidden" style="position:absolute;left:-9999px">Bimestre</span><select id="bim"></select></label>
+    <div class="acciones">
+      <a class="guia" href="guia-panel.pdf" target="_blank" rel="noopener">📖 ¿Cómo leer este panel?</a>
+      <label><span class="visually-hidden" style="position:absolute;left:-9999px">Bimestre</span><select id="bim"></select></label>
+    </div>
   </header>
   <div id="app"><p class="empty">Cargando…</p></div>
   <footer>NPS = % de promotores (9–10) menos % de detractores (0–6). Va de −100 a 100. Atributos en escala de 1 a 5. Encuesta anónima. <span id="upd"></span></footer>
@@ -307,7 +314,11 @@
     var btn = document.querySelector("#acceso button");
     if (btn) { btn.disabled = true; btn.textContent = "Verificando…"; }
     fetch(url + "?k=" + encodeURIComponent(clave))
-      .then(function (r) { return r.json(); })
+      .then(function (r) { return r.text(); })
+      .then(function (t) {
+        try { return JSON.parse(t); }
+        catch (e) { throw new Error("El script de Google respondió con una página de error en lugar de datos. Revisa que la implementación esté actualizada (Nueva versión) y con acceso \"Cualquier usuario\"."); }
+      })
       .then(function (d) {
         if (!d.ok && d.error === "Clave inválida") { sesion(function (s) { s.removeItem("panel-clave"); }); pedirClave("Clave incorrecta. Revísala e inténtalo de nuevo."); return; }
         if (!d.ok) throw new Error(d.error);
