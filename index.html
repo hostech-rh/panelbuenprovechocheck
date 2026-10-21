@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel de comida · Hostech</title>
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f6f5ec;
+    --card: #ffffff;
+    --ink: #14142b;
+    --ink-2: #4d4d63;
+    --muted: #7a7a8c;
+    --line: #e4e2d6;
+    --grid: #ecebe2;
+    --chip: #f1f0e6;
+    --pro: #4563ff;
+    --pas: #b4b3aa;
+    --det: #c40e91;
+    --bar: #0098d9;
+    --yellow: #f4d83f;
+    --up: #127a3a;
+    --down: #c40e91;
+    --shadow: 0 1px 2px rgba(20,20,43,.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #101018; --card: #1a1a24; --ink: #f6f5ec; --ink-2: #c9c8d4; --muted: #8f8fa3;
+      --line: #2d2d3a; --grid: #262632; --chip: #24242f; --pro: #6f86ff; --pas: #5c5c68; --det: #e04aae;
+      --bar: #2aa9e6; --up: #3fbf6a; --down: #e04aae; --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #101018; --card: #1a1a24; --ink: #f6f5ec; --ink-2: #c9c8d4; --muted: #8f8fa3;
+    --line: #2d2d3a; --grid: #262632; --chip: #24242f; --pro: #6f86ff; --pas: #5c5c68; --det: #e04aae;
+    --bar: #2aa9e6; --up: #3fbf6a; --down: #e04aae; --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 56px; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; justify-content: space-between; margin-bottom: 20px; }
+  .id { display: flex; align-items: center; gap: 14px; }
+  .id img { width: 36px; }
+  .id small { display: block; font-size: 13px; color: var(--muted); font-weight: 500; letter-spacing: .02em; }
+  h1 { font-size: 22px; margin: 0; line-height: 1.25; }
+  select { font: inherit; font-weight: 500; padding: 8px 36px 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  .demo { background: var(--yellow); color: #14142b; font-size: 13px; padding: 8px 14px; border-radius: 10px; margin-bottom: 16px; }
+  .kpis { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); min-width: 0; }
+  .kpi .lbl { font-size: 13px; color: var(--muted); font-weight: 500; }
+  .kpi .val { font-size: 34px; font-weight: 700; line-height: 1.15; margin-top: 4px; }
+  .kpi.hero .val { font-size: 52px; }
+  .kpi .sub { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+  .delta.up { color: var(--up); font-weight: 600; }
+  .delta.down { color: var(--down); font-weight: 600; }
+  .zona { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 99px; background: var(--chip); color: var(--ink-2); margin-top: 6px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  h2 { font-size: 16px; margin: 0 0 2px; }
+  .desc { font-size: 13px; color: var(--muted); margin: 0 0 14px; }
+  .stack { display: flex; height: 36px; gap: 2px; border-radius: 8px; overflow: hidden; }
+  .stack div { min-width: 0; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; font-size: 13px; color: var(--ink-2); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .legend b { color: var(--ink); }
+  svg text { font-family: inherit; }
+  .cols { display: flex; gap: 2px; padding-bottom: 22px; position: relative; }
+  .cols::after { content: ""; position: absolute; left: 0; right: 0; bottom: 22px; border-top: 1px solid var(--line); }
+  .col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; min-width: 0; }
+  .col .b { width: 72%; max-width: 44px; border-radius: 4px 4px 0 0; }
+  .col .v { font-size: 12px; font-weight: 600; color: var(--ink-2); line-height: 18px; }
+  .col .x { position: absolute; bottom: -22px; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .attr { display: grid; grid-template-columns: minmax(110px, 200px) 1fr 76px; align-items: center; gap: 10px; padding: 7px 0; }
+  .attr .name { font-size: 14px; }
+  .attr .name em { display: block; font-style: normal; font-size: 11px; font-weight: 600; color: var(--det); letter-spacing: .03em; }
+  .attr .track { height: 14px; background: var(--grid); border-radius: 0 4px 4px 0; position: relative; }
+  .attr .track div { height: 100%; background: var(--bar); border-radius: 0 4px 4px 0; }
+  .attr .track.weak div { background: var(--det); }
+  .attr .num { font-size: 14px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .attr .num span { display: block; font-size: 11px; font-weight: 500; }
+  .scale { display: grid; grid-template-columns: minmax(110px, 200px) 1fr 76px; gap: 10px; font-size: 11px; color: var(--muted); }
+  .scale div { display: flex; justify-content: space-between; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .chips button { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); padding: 5px 12px; border-radius: 99px; cursor: pointer; }
+  .chips button[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+  .coments { list-style: none; margin: 0; padding: 0; max-height: 420px; overflow: auto; }
+  .coments li { padding: 10px 0 10px 14px; border-bottom: 1px solid var(--line); position: relative; font-size: 14px; }
+  .coments li::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 4px; border-radius: 4px; background: var(--c); }
+  .coments li small { display: block; color: var(--muted); font-size: 12px; }
+  .empty { color: var(--muted); font-size: 14px; padding: 12px 0; }
+  .tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--card); font-size: 12px; padding: 6px 10px; border-radius: 8px; opacity: 0; transition: opacity .1s; z-index: 10; white-space: nowrap; }
+  footer { font-size: 12px; color: var(--muted); margin-top: 20px; }
+  .err { background: var(--card); border: 1px solid var(--det); padding: 16px; border-radius: 12px; }
+  @media (max-width: 820px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .kpi.hero { grid-column: span 3; } .grid2 { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { .attr, .scale { grid-template-columns: 96px 1fr 62px; gap: 8px; } .kpi .val { font-size: 24px; } .kpi { padding: 14px 12px; } .kpi .lbl { font-size: 12px; } .kpi.hero .val { font-size: 44px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="id"><img src="logo.svg" alt="Hostech"><div><small>HOSTECH · Buen Provecho Check</small><h1>Resultados del servicio de comida</h1></div></div>
+    <label><span class="visually-hidden" style="position:absolute;left:-9999px">Bimestre</span><select id="bim"></select></label>
+  </header>
+  <div id="app"><p class="empty">Cargando resultados…</p></div>
+  <footer>NPS = % de promotores (9–10) menos % de detractores (0–6). Va de −100 a 100. Atributos en escala de 1 a 5. Encuesta anónima. <span id="upd"></span></footer>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+  // URL de la aplicación web de Google Apps Script (termina en /exec)
+  window.NPS_CONFIG = { SCRIPT_URL: "https://script.google.com/macros/s/AKfycbzC2gFDm0yvSGY1DVnp_qQeYBC9k2Te_Sa9YacXXGuCo5TIFylR84DVjvblcJd0Iis/exec" };
+</script>
+<script>
+(function () {
+  var ATR = [
+    ["sabor", "Sabor"], ["variedad", "Variedad del menú"], ["porcion", "Tamaño de la porción"],
+    ["calidad", "Calidad y frescura"], ["higiene", "Higiene y estado del tóper"],
+    ["puntualidad", "Puntualidad y temperatura"], ["saludable", "Saludable y balanceada"]
+  ];
+  var params = new URLSearchParams(location.search);
+  var url = window.NPS_CONFIG && window.NPS_CONFIG.SCRIPT_URL;
+  var esDemo = params.has("demo") || !url;
+  var datos, sel;
+  var tip = document.getElementById("tip");
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return "&#" + c.charCodeAt(0) + ";"; }); }
+  function pct(a, n) { return n ? Math.round(a / n * 100) : 0; }
+  function grupo(nps) { return nps >= 9 ? "pro" : nps >= 7 ? "pas" : "det"; }
+  function zona(n) { return n >= 50 ? "Excelente" : n >= 30 ? "Bueno" : n >= 0 ? "Por mejorar" : "Crítico"; }
+  function delta(v, prev, dec, suf) {
+    if (prev == null) return "";
+    var d = Math.round((v - prev) * Math.pow(10, dec)) / Math.pow(10, dec);
+    if (d === 0) return '<span class="delta">= sin cambio</span>';
+    return '<span class="delta ' + (d > 0 ? "up" : "down") + '">' + (d > 0 ? "▲ +" : "▼ ") + d.toFixed(dec) + (suf || "") + "</span>";
+  }
+
+  function mostrarTip(e, html) {
+    tip.innerHTML = html; tip.style.opacity = 1;
+    var x = Math.min(e.clientX + 12, window.innerWidth - tip.offsetWidth - 8);
+    tip.style.left = x + "px"; tip.style.top = (e.clientY - tip.offsetHeight - 12) + "px";
+  }
+  document.addEventListener("pointermove", function (e) {
+    var t = e.target.closest && e.target.closest("[data-tip]");
+    if (t) mostrarTip(e, t.getAttribute("data-tip")); else tip.style.opacity = 0;
+  });
+
+  function render() {
+    var lista = datos.bimestres;
+    var i = lista.findIndex(function (b) { return b.id === sel; });
+    var b = lista[i], prev = lista[i - 1];
+    var app = document.getElementById("app");
+    var h = "";
+    if (esDemo) h += '<div class="demo">Vista de ejemplo con datos ficticios. Conecta el script de Google Sheets para ver resultados reales.</div>';
+
+    // KPIs
+    h += '<div class="kpis">' +
+      '<div class="card kpi hero"><div class="lbl">NPS · ' + esc(b.etiqueta) + '</div><div class="val">' + (b.nps > 0 ? "+" : "") + b.nps + '</div>' +
+      '<div class="sub">' + (prev ? delta(b.nps, prev.nps, 0, " pts") + " vs " + esc(prev.etiqueta) : "Primer bimestre medido") + '</div><span class="zona">' + zona(b.nps) + '</span></div>' +
+      '<div class="card kpi"><div class="lbl">Respuestas</div><div class="val">' + b.n + '</div><div class="sub">' + (prev ? delta(b.n, prev.n, 0) : "") + '</div></div>' +
+      '<div class="card kpi"><div class="lbl">Promotores (9–10)</div><div class="val">' + pct(b.promotores, b.n) + '%</div><div class="sub">' + (prev ? delta(pct(b.promotores, b.n), pct(prev.promotores, prev.n), 0, " pts") : "") + '</div></div>' +
+      '<div class="card kpi"><div class="lbl">Detractores (0–6)</div><div class="val">' + pct(b.detractores, b.n) + '%</div><div class="sub">' + (prev ? delta(pct(b.detractores, b.n), pct(prev.detractores, prev.n), 0, " pts").replace("up", "x").replace("down", "up").replace("x", "down") : "") + '</div></div>' +
+      '</div>';
+
+    // Atributos + composición
+    var orden = ATR.slice().sort(function (x, y) { return b.promedios[x[0]] - b.promedios[y[0]]; });
+    var atr = '<div class="card"><h2>Calificación por aspecto</h2><p class="desc">Promedio de 1 a 5, ordenado de menor a mayor. En rosa, las dos prioridades de mejora.</p>';
+    orden.forEach(function (a, k) {
+      var v = b.promedios[a[0]], weak = k < 2;
+      atr += '<div class="attr" data-tip="' + esc(a[1]) + ": " + v.toFixed(2) + ' de 5"><div class="name">' + (weak ? "<em>PRIORIDAD</em>" : "") + esc(a[1]) + '</div>' +
+        '<div class="track' + (weak ? " weak" : "") + '"><div style="width:' + ((v - 1) / 4 * 100) + '%"></div></div>' +
+        '<div class="num">' + v.toFixed(1) + (prev ? delta(v, prev.promedios[a[0]], 1) : "") + "</div></div>";
+    });
+    atr += '<div class="scale"><span></span><div><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div><span></span></div></div>';
+
+    var comp = '<div class="card"><h2>¿Quién recomienda el servicio?</h2><p class="desc">Respuestas a "¿qué tan probable es que lo recomiendes?"</p><div class="stack">';
+    [["det", "Detractores (0–6)", b.detractores], ["pas", "Pasivos (7–8)", b.pasivos], ["pro", "Promotores (9–10)", b.promotores]].forEach(function (g) {
+      if (g[2]) comp += '<div style="flex:' + g[2] + ';background:var(--' + g[0] + ')" data-tip="' + g[1] + ": " + g[2] + " (" + pct(g[2], b.n) + '%)"></div>';
+    });
+    comp += '</div><div class="legend"><span><i style="background:var(--det)"></i>Detractores <b>' + pct(b.detractores, b.n) + '%</b></span><span><i style="background:var(--pas)"></i>Pasivos <b>' + pct(b.pasivos, b.n) + '%</b></span><span><i style="background:var(--pro)"></i>Promotores <b>' + pct(b.promotores, b.n) + "%</b></span></div>";
+    comp += '<div style="margin-top:22px">' + barras(b.distribucion.map(function (v, k) { return { x: String(k), v: v, c: "var(--" + grupo(k) + ")", t: "Calificación " + k + ": " + v + " respuestas" }; }), 150) + "</div>";
+    comp += '<p class="desc" style="margin:6px 0 0">Número de respuestas por calificación del 0 al 10.</p></div>';
+    h += '<div class="grid2">' + atr + comp + "</div>";
+
+    // Evolución + frecuencia
+    var evo = '<div class="card"><h2>Evolución del NPS</h2><p class="desc">Un punto por bimestre.</p>' + linea(lista, i) + "</div>";
+    var dias = ["1 día", "2 días", "3 días", "4 días", "5 días"];
+    var frec = '<div class="card"><h2>¿Cuántos días comen del servicio?</h2><p class="desc">Días por semana que consume quien respondió.</p>' +
+      barras(b.dias.map(function (v, k) { return { x: dias[k], v: v, c: "var(--bar)", t: dias[k] + ": " + v + " personas (" + pct(v, b.n) + "%)" }; }), 170) + "</div>";
+    h += '<div class="grid2">' + evo + frec + "</div>";
+
+    // Comentarios
+    h += '<div class="card"><h2>Lo que piden mejorar</h2><p class="desc">Comentarios abiertos de este bimestre (' + b.comentarios.length + "), tal como los escribieron.</p>" +
+      '<div class="chips" id="chips"><button aria-pressed="true" data-g="">Todos</button><button aria-pressed="false" data-g="det">Detractores</button><button aria-pressed="false" data-g="pas">Pasivos</button><button aria-pressed="false" data-g="pro">Promotores</button></div><ul class="coments" id="coments"></ul></div>';
+
+    app.innerHTML = h;
+    comentarios(b, "");
+    document.getElementById("chips").addEventListener("click", function (e) {
+      var g = e.target.getAttribute("data-g"); if (g == null) return;
+      [].forEach.call(this.children, function (bt) { bt.setAttribute("aria-pressed", bt === e.target); });
+      comentarios(b, g);
+    });
+  }
+
+  function comentarios(b, g) {
+    var items = b.comentarios.filter(function (c) { return !g || grupo(c.nps) === g; });
+    document.getElementById("coments").innerHTML = items.length ? items.map(function (c) {
+      return '<li style="--c:var(--' + grupo(c.nps) + ')">' + esc(c.texto) + "<small>Calificó con " + c.nps + "</small></li>";
+    }).join("") : '<li class="empty" style="--c:transparent">Sin comentarios en este grupo.</li>';
+  }
+
+  // Columnas verticales con eje en cero, valor encima y tooltip
+  function barras(items, alto) {
+    var max = Math.max.apply(null, items.map(function (d) { return d.v; })) || 1;
+    return '<div class="cols" style="height:' + alto + 'px">' + items.map(function (d) {
+      return '<div class="col" data-tip="' + esc(d.t) + '"><span class="v">' + (d.v || "") + '</span>' +
+        '<div class="b" style="height:calc((100% - 18px) * ' + (d.v / max).toFixed(4) + ');background:' + d.c + '"></div><span class="x">' + esc(d.x) + "</span></div>";
+    }).join("") + "</div>";
+  }
+
+  // Línea de NPS por bimestre (escala fija -100 a 100 con referencia en 0)
+  function linea(lista, actual) {
+    var W = 520, H = 210, L = 64, R = 40, T = 16, B = 30;
+    var x = function (k) { return lista.length === 1 ? (L + W - R) / 2 : L + k * (W - L - R) / (lista.length - 1); };
+    var y = function (v) { return T + (100 - v) / 200 * (H - T - B); };
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" width="100%" style="display:block;max-height:240px">';
+    [-100, -50, 0, 50, 100].forEach(function (t) {
+      s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t) + '" y2="' + y(t) + '" stroke="' + (t === 0 ? "var(--pas)" : "var(--grid)") + '" stroke-width="1"/>' +
+        '<text x="' + (L - 8) + '" y="' + (y(t) + 4) + '" text-anchor="end" font-size="11" fill="var(--muted)">' + t + "</text>";
+    });
+    s += '<polyline fill="none" stroke="var(--pro)" stroke-width="2" stroke-linejoin="round" points="' + lista.map(function (b, k) { return x(k) + "," + y(b.nps); }).join(" ") + '"/>';
+    lista.forEach(function (b, k) {
+      var on = k === actual;
+      s += '<g data-tip="' + esc(b.etiqueta) + ": NPS " + b.nps + " (" + b.n + ' resp.)"><rect x="' + (x(k) - 24) + '" y="0" width="48" height="' + H + '" fill="transparent"/>' +
+        '<circle cx="' + x(k) + '" cy="' + y(b.nps) + '" r="' + (on ? 6 : 4.5) + '" fill="var(--pro)" stroke="var(--card)" stroke-width="2"/>' +
+        '<text x="' + x(k) + '" y="' + (H - 10) + '" text-anchor="middle" font-size="11" fill="' + (on ? "var(--ink)" : "var(--muted)") + '" font-weight="' + (on ? 600 : 400) + '">' + esc(b.etiqueta.replace(/ \d{4}$/, "")) + "</text>" +
+        (on ? '<text x="' + x(k) + '" y="' + (y(b.nps) - 12) + '" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">' + b.nps + "</text>" : "") + "</g>";
+    });
+    return s + "</svg>";
+  }
+
+  function iniciar(d) {
+    datos = d;
+    if (!d.bimestres.length) { document.getElementById("app").innerHTML = '<p class="empty">Todavía no hay respuestas.</p>'; return; }
+    var selEl = document.getElementById("bim");
+    selEl.innerHTML = d.bimestres.slice().reverse().map(function (b) { return '<option value="' + b.id + '">' + esc(b.etiqueta) + "</option>"; }).join("");
+    sel = d.bimestres[d.bimestres.length - 1].id;
+    selEl.onchange = function () { sel = this.value; render(); };
+    if (d.actualizado) document.getElementById("upd").textContent = "Actualizado: " + new Date(d.actualizado).toLocaleString("es-MX");
+    render();
+  }
+
+  function demo() {
+    var et = ["May–Jun 2026", "Jul–Ago 2026", "Sep–Oct 2026"];
+    var dist = [[2, 1, 3, 4, 5, 8, 9, 12, 10, 6, 4], [1, 1, 2, 3, 4, 7, 8, 13, 12, 8, 6], [0, 1, 1, 2, 3, 6, 7, 12, 14, 11, 9]];
+    var prom = [[3.6, 2.7, 3.1, 3.4, 3.9, 3.0, 3.2], [3.7, 2.8, 3.3, 3.5, 4.0, 3.3, 3.2], [3.9, 2.9, 3.4, 3.7, 4.1, 3.6, 3.3]];
+    var coms = [
+      ["Que cambien más seguido el menú, se repite mucho el pollo.", 5], ["A veces llega frío el guisado.", 6],
+      ["El sabor está bien, pero la porción de proteína es chica.", 7], ["Más verduras y menos frituras.", 8],
+      ["Muy rica la comida del jueves, ojalá hubiera más así.", 9], ["El tóper llegó abierto dos veces.", 4],
+      ["Agregar opción vegetariana.", 7], ["Todo bien, gracias.", 10]
+    ];
+    return {
+      actualizado: null,
+      bimestres: et.map(function (e, k) {
+        var d = dist[k], n = d.reduce(function (a, b) { return a + b; }), det = d.slice(0, 7).reduce(function (a, b) { return a + b; }), pro = d[9] + d[10];
+        var p = {}; ATR.forEach(function (a, j) { p[a[0]] = prom[k][j]; });
+        return { id: "2026-B" + (k + 3), etiqueta: e, n: n, promotores: pro, pasivos: d[7] + d[8], detractores: det, nps: Math.round((pro - det) / n * 100),
+          distribucion: d, dias: [3, 6, 10, 18, n - 37], promedios: p, comentarios: coms.slice(k, k + 6).map(function (c) { return { texto: c[0], nps: c[1] }; }) };
+      })
+    };
+  }
+
+  if (esDemo) { iniciar(demo()); return; }
+  fetch(url + "?k=" + encodeURIComponent(params.get("k") || ""))
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (!d.ok) throw new Error(d.error === "Clave inválida" ? "El enlace no tiene una clave válida. Pide el enlace completo del panel." : d.error);
+      iniciar(d);
+    })
+    .catch(function (e) {
+      document.getElementById("app").innerHTML = '<div class="err">No se pudieron cargar los resultados. ' + esc(e.message) + "</div>";
+    });
+})();
+</script>
+</body>
+</html>
